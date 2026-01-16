@@ -201,15 +201,22 @@ const App: React.FC = () => {
   };
 
   const handleSearch = async () => {
-    if (!apiKey) {
-      alert("Please enter a Gemini API Key to start scouting.");
-      return;
-    }
     setIsLoading(true);
     setReport(null);
     setStatusMessage('Scanning Niche Trends...');
     try {
-      const result = await runAnalystAgent(apiKey, params, (msg) => setStatusMessage(msg));
+      const response = await fetch('/api/scout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ params })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Server error');
+      }
+
+      const result = await response.json();
       setReport(result);
     } catch (err: any) {
       setReport({ text: `### Failed to Scan\n\n${err.message}` });
