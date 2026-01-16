@@ -216,7 +216,14 @@ const App: React.FC = () => {
       }
 
       const result = await response.json();
-      setReport(result);
+      // Clean up text if it contains markdown JSON blocks
+      let cleanText = result.text;
+      if (cleanText.includes('```json')) {
+        cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+      } else if (cleanText.includes('```')) {
+        cleanText = cleanText.split('```')[1].split('```')[0].trim();
+      }
+      setReport({ ...result, text: cleanText });
     } catch (err: any) {
       setReport({ text: `### Failed to Scan\n\n${err.message}` });
     } finally {
