@@ -1,11 +1,10 @@
 
 import { GoogleGenAI, GenerateContentResponse, Content } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+export const runAnalystAgent = async (apiKey: string, params: { time_window_days: number, max_price_usd: number }, onUpdate: (msg: string) => void) => {
+  const ai = new GoogleGenAI({ apiKey });
+  const model = 'gemini-2.0-flash-exp';
 
-export const runAnalystAgent = async (params: { time_window_days: number, max_price_usd: number }, onUpdate: (msg: string) => void) => {
-  const model = 'gemini-3-pro-preview';
-  
   const systemInstruction = `You are a Social Commerce Trend Scout specializing in "Viral Arbitrage." 
   Your goal is to find high-novelty, problem-solving products (<= $${params.max_price_usd}) that are exploding on TikTok/Instagram in the UK, USA, BR, or KR but are entirely missing from India.
 
@@ -48,7 +47,7 @@ export const runAnalystAgent = async (params: { time_window_days: number, max_pr
         systemInstruction,
         tools: [{ googleSearch: {} }],
         thinkingConfig: { thinkingBudget: 15000 },
-        temperature: 0.2, 
+        temperature: 0.2,
       }
     });
 

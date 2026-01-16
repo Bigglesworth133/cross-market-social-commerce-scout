@@ -177,6 +177,7 @@ const ResultsDashboard: React.FC<{ report: any }> = ({ report }) => {
 
 const App: React.FC = () => {
   const [params, setParams] = useState<SearchParams>({ time_window_days: 7, max_price_usd: 50 });
+  const [apiKey, setApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [report, setReport] = useState<any>(null);
@@ -200,11 +201,15 @@ const App: React.FC = () => {
   };
 
   const handleSearch = async () => {
+    if (!apiKey) {
+      alert("Please enter a Gemini API Key to start scouting.");
+      return;
+    }
     setIsLoading(true);
     setReport(null);
     setStatusMessage('Scanning Niche Trends...');
     try {
-      const result = await runAnalystAgent(params, (msg) => setStatusMessage(msg));
+      const result = await runAnalystAgent(apiKey, params, (msg) => setStatusMessage(msg));
       setReport(result);
     } catch (err: any) {
       setReport({ text: `### Failed to Scan\n\n${err.message}` });
@@ -224,6 +229,17 @@ const App: React.FC = () => {
             <div className="bg-white rounded-[40px] border border-slate-200 p-8 shadow-xl shadow-slate-200/40 sticky top-24">
               <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Arbitrage Setup</h2>
               <div className="space-y-8">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-900 uppercase mb-3 tracking-tighter">Gemini API Key</label>
+                  <input
+                    type="password"
+                    placeholder="AIzaSy..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-medium outline-none focus:border-indigo-500"
+                  />
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-[9px] text-indigo-600 font-bold mt-2 block underline">Get free key here</a>
+                </div>
                 <div>
                   <label className="block text-[10px] font-black text-slate-900 uppercase mb-3 tracking-tighter">Signal Window</label>
                   <select
